@@ -1,5 +1,5 @@
 import streamlit as st
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers.models import BertTokenizer, BertForSequenceClassification
 import torch
 
 st.title("Text-to-Cognitive Load Estimator")
