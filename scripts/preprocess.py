@@ -1,21 +1,31 @@
+from datasets import load_dataset
 import pandas as pd
-import re
-from textstat import flesch_kincaid_grade
+import os
 
-def clean_text(text):
-    text = re.sub(r'\s+', ' ', text)
-    return text.strip()
+# Load dataset
+ds = load_dataset("iastate/onestop_english")
+label_names = ds['train'].features['label'].names  # ['ele', 'int', 'adv']
 
-def label_text(text):
-    score = flesch_kincaid_grade(text)
-    if score < 5:
-        return "Low"
-    elif score < 10:
-        return "Medium"
-    else:
-        return "High"
+# Mapping to cognitive load levels
+level_map = {
+    "ele": "Low",
+    "int": "Medium",
+    "adv": "High"
+}
 
-def preprocess(df):
-    df['text'] = df['text'].apply(clean_text)
-    df['label'] = df['text'].apply(label_text)
-    return df
+data = []
+for item in ds['train']:
+    text = item['text']
+    label_id = item['label']
+    label_str = label_names[label_id]  # Convert ID to string label
+
+    final_label = level_map.get(label_str)
+    if final_label:
+        data.append((text.strip(), final_label))
+
+# Save CSV
+df = pd.DataFrame(data, columns=['text', 'label'])
+os.makedirs("data/preprocessed", exist_ok=True)
+df.to_csv("data/preprocessed/labeled.csv", index=False)
+
+print(f"✅ Saved {len(df)} rows to data/preprocessed/labeled.csv")
