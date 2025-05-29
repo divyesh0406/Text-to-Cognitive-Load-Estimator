@@ -15,5 +15,5 @@ if st.button("Estimate Load"):
         logits = model(**inputs).logits
         pred = torch.argmax(logits, dim=1).item()
     st.write(f"**Cognitive Load**: {['Low', 'Medium', 'High'][pred]}")
-    st.balloons()
+    # st.balloons()
     st.write("Thank you for using the Cognitive Load Estimator!")
